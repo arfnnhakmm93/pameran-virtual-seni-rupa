@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pameran Virtual Seni Rupa — Kelas 4 SD | PJJ Samarinda</title>
+<style>
+:root{
+  --paper:#FFF8E9; --card:#FFFFFF; --ink:#2B2118; --muted:#7A6A58;
+  --yellow:#FFC93C; --blue:#3AA7E3; --red:#FF6B6B; --green:#51CF66; --lilac:#B197FC;
+  --line:#2B2118; --radius:18px;
+}
+/* tema gelap: semua permukaan ikut variabel, teks selalu kontras */
+body.gelap{--paper:#1E1610;--card:#2C231A;--ink:#F5EAD6;--muted:#CBB99E;--line:#E8DCC4}
+body.gelap::before{background-image:radial-gradient(#ffffff14 1.2px, transparent 1.2px)}
+body.gelap header.hero{background:linear-gradient(180deg,#3A2C1C,#1E1610)}
+body.gelap .kv{background:#3A2E20}
+body.gelap .card{background:#3D2F1F}
+body.gelap .item{background:#3D2F1F}
+body.gelap .pk{background:#3D2F1F}
+body.gelap tr:nth-child(even) td{background:#332818}
+body.gelap .btn:not(.ghost),body.gelap .del{color:#1E1610}
+body.gelap ::placeholder{color:#9A8A72}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Trebuchet MS","Segoe UI Rounded","Comic Sans MS",system-ui,sans-serif;line-height:1.6}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(#00000010 1.2px, transparent 1.2px);background-size:22px 22px}
+header.hero{border-bottom:3px solid var(--line);background:linear-gradient(180deg,#FFE9A8,#FFF8E9);padding:28px 18px 20px;text-align:center}
+.badge{display:inline-block;border:2px solid var(--line);border-radius:999px;padding:4px 14px;font-weight:700;font-size:13px;background:var(--card);box-shadow:3px 3px 0 var(--line);margin:4px}
+h1{font-size:clamp(24px,5vw,42px);margin:10px 0 6px;letter-spacing:.3px}
+.sub{max-width:760px;margin:0 auto;color:var(--muted)}
+main{max-width:1020px;margin:0 auto;padding:18px 14px 60px}
+section{background:var(--card);border:2.5px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:6px 6px 0 var(--line);margin:18px 0}
+h2{margin:0 0 8px;font-size:22px}
+h2 .dot{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid var(--line);margin-right:8px;vertical-align:baseline}
+p.hint{color:var(--muted);margin-top:0}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.filters button{border:2px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);padding:8px 16px;font-weight:800;cursor:pointer;box-shadow:3px 3px 0 var(--line)}
+.filters button.active{background:var(--ink);color:var(--paper)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.card{border:2.5px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card);cursor:pointer;transition:transform .15s}
+.card:hover{transform:translateY(-3px) rotate(-.3deg)}
+.card img{width:100%;height:180px;object-fit:cover;display:block;border-bottom:2.5px solid var(--line);background:#eee}
+.card .body{padding:12px}
+.tag{font-size:12px;font-weight:800;border:2px solid var(--line);border-radius:999px;padding:2px 10px;display:inline-block;color:#1E1610}
+.tag.d2{background:#D0EBFF}.tag.d3{background:#FFE8CC}
+.card h3{margin:8px 0 4px;font-size:17px}
+.card p{margin:0;color:var(--muted);font-size:14px}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(43,33,24,.65);display:none;align-items:center;justify-content:center;padding:14px;z-index:50;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.modal.open{display:flex}
+.sheet{background:var(--card);border:3px solid var(--line);border-radius:18px;max-width:760px;width:100%;max-height:92vh;overflow:auto;box-shadow:8px 8px 0 var(--line)}
+.sheet img{width:100%;height:auto;max-height:70vh;object-fit:contain;display:block;border-bottom:3px solid var(--line);background:#1f1a15}
+.sheet .pad{padding:16px 18px}
+.kv{display:grid;grid-template-columns:130px 1fr;gap:6px 10px;background:#FFF4D6;border:2px dashed var(--line);border-radius:12px;padding:12px;margin:10px 0;font-size:15px}
+.kv b{font-size:14px}
+.closebar{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.btn{border:2.5px solid var(--line);border-radius:12px;background:var(--yellow);padding:10px 16px;font-weight:800;cursor:pointer;box-shadow:4px 4px 0 var(--line)}
+.btn.ghost{background:var(--card);color:var(--ink)}.btn.blue{background:#D0EBFF}.btn.green{background:#B2F2BB}.btn.red{background:#FFC9C9}
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+th,td{border:2px solid var(--line);padding:9px 8px;text-align:left;vertical-align:top}
+th{background:var(--ink);color:var(--paper)}
+tr:nth-child(even) td{background:#FFF9EC}
+.wrap{overflow-x:auto}
+/* journal */
+label{font-weight:800;font-size:14px;display:block;margin:10px 0 4px}
+select,input,textarea{width:100%;border:2.5px solid var(--line);border-radius:12px;padding:10px;font-family:inherit;font-size:15px;background:var(--card);color:var(--ink)}
+textarea{min-height:76px;resize:vertical}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.row2{grid-template-columns:1fr}.kv{grid-template-columns:1fr}}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+#jurnalList{margin-top:12px}
+.item{border:2px solid var(--line);border-radius:12px;padding:10px;margin:8px 0;background:var(--card)}
+.item small{color:var(--muted)}
+.del{float:right;border:2px solid var(--line);background:#FFC9C9;border-radius:9px;font-weight:800;cursor:pointer;padding:2px 10px}
+/* jurnal kid-friendly */
+.step{border:2.5px solid var(--line);border-radius:14px;padding:12px;margin:12px 0;background:var(--paper)}
+.step h3{margin:0 0 8px;font-size:17px}
+.step h3 .no{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--yellow);border:2px solid var(--line);font-size:15px;margin-right:6px;color:#1E1610}
+.pilih{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:560px){.pilih{grid-template-columns:repeat(2,1fr)}}
+.pk{border:2.5px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card);cursor:pointer;padding:0;font-family:inherit;color:var(--ink);position:relative}
+.pk img{width:100%;height:86px;object-fit:cover;display:block;border-bottom:2px solid var(--line);pointer-events:none}
+.pk span{display:block;font-size:12.5px;font-weight:800;padding:6px;line-height:1.35;pointer-events:none}
+.pk.on{outline:4px solid var(--yellow);transform:scale(1.03)}
+.pk.on::after{content:"✔";position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:var(--green);border:2px solid var(--line);font-weight:800;font-size:15px;line-height:22px;color:#1E1610}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.chip{border:2px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);padding:5px 12px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit}
+.chip.on{background:var(--ink);color:var(--paper)}
+.starter{display:inline-block;border:2px dashed var(--line);border-radius:999px;background:var(--card);color:var(--ink);padding:5px 12px;font-size:13.5px;margin:0 8px 8px 0;cursor:pointer;font-family:inherit}
+.starter:hover{background:var(--yellow);color:#1E1610}
+.bintang{font-size:34px;letter-spacing:4px;margin:2px 0}
+.bar{height:14px;border:2.5px solid var(--line);border-radius:999px;overflow:hidden;background:var(--card);margin:8px 0}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--yellow),var(--green));transition:width .3s}
+.item{display:flex;gap:10px;align-items:flex-start}
+.item img{width:74px;height:74px;object-fit:cover;border-radius:10px;border:2px solid var(--line);flex:none}
+.item .tx{flex:1;min-width:0}
+/* notifikasi custom */
+.notif{position:fixed;inset:0;background:rgba(43,33,24,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:80;-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}
+.notif.open{display:flex}
+.notif .box{background:var(--card);border:3px solid var(--line);border-radius:18px;box-shadow:8px 8px 0 var(--line);max-width:420px;width:100%;padding:20px;text-align:center;animation:pop .18s ease-out}
+@keyframes pop{from{transform:scale(.9)}to{transform:scale(1)}}
+.notif .emoji{font-size:42px}
+.notif .box p{margin:6px 0 16px;font-size:15.5px}
+.notif .row{display:flex;gap:10px;justify-content:center}
+footer{text-align:center;color:var(--muted);padding:20px;font-size:13px}
+@media print{.filters,.actions,.modal,header .badge.no-print{display:none}section{box-shadow:none;break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div style="display:flex;justify-content:flex-end;max-width:1020px;margin:0 auto"><button class="btn ghost" id="tema" style="padding:6px 14px;font-size:14px">🌙 Mode Gelap</button></div>
+  <span class="badge">🏠 PJJ — Sabtu • Efek Karhutla Samarinda</span>
+  <span class="badge">🎨 Seni Rupa Kelas 4 SD — Bab 2</span>
+  <h1>🖼️ Pameran Virtual Karya Seni Rupa</h1>
+  <p class="sub"><b>Tujuan:</b> membandingkan karakteristik hasil karya <b>2D</b> dan <b>3D</b>, serta mengamati <b>Nama/Jenis karya, Alat, Bahan,</b> dan menuliskan <b>Pendapat</b> di Jurnal Pengamatan.</p>
+</header>
+
+<main>
+
+<section>
+  <h2><span class="dot" style="background:var(--yellow)"></span>Ruang Pamer — Klik gambar untuk detail</h2>
+  <p class="hint">Ada 6 karya: 3 karya <b>2D</b> (hanya bisa dilihat dari depan) dan 3 karya <b>3D</b> (bisa dilihat dari semua sisi, punya volume).</p>
+  <div class="filters">
+    <button data-f="semua" class="active">Semua (6)</button>
+    <button data-f="2D">2D (3)</button>
+    <button data-f="3D">3D (3)</button>
+  </div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<section>
+  <h2><span class="dot" style="background:var(--blue)"></span>Perbandingan Karakteristik</h2>
+  <p class="hint">Kunci Bab 2: <b>Alat = dipakai lagi 🔄</b> (kuas, gunting, pensil). <b>Bahan = habis dipakai ⏳</b> (kertas, cat air, krayon, tanah liat, lem).</p>
+  <div class="wrap">
+  <table>
+    <tr><th>Bahan / Karya</th><th>Ciri Hasil</th><th>Cocok Untuk</th><th>Hati-hati ⚠️</th></tr>
+    <tr><td><b>✏️ Pensil Warna</b> (2D)</td><td>Rapi, halus, warna lembut kurang pekat</td><td>Gambar kecil & detail (mata, bunga, motif)</td><td>Ditekan keras → kertas sobek</td></tr>
+    <tr><td><b>🎨 Cat Air</b> (2D)</td><td>Cerah, transparan, bisa dicampur (Kuning+Biru=Hijau)</td><td>Area luas (langit, laut, sawah)</td><td>Air kebanyakan → bleber, kertas tipis sobek; tunggu kering</td></tr>
+    <tr><td><b>🖍️ Krayon</b> (2D)</td><td>Tebal, pekat, mengkilap (lilin)</td><td>Gambar bebas kaya warna</td><td>Mudah patah, sulit dihapus, tangan kotor</td></tr>
+    <tr><td><b>🏺 Tanah Liat</b> (3D)</td><td>Kokoh, bertekstur, bervolume</td><td>Vas, patung</td><td>Mudah retak kalau tipis; perlu dikeringkan</td></tr>
+    <tr><td><b>🐟 Plastisin</b> (3D)</td><td>Lunak, warna-warni, bisa dibentuk ulang</td><td>Patung hewan, mainan</td><td>Lengket jika panas; berdebu</td></tr>
+    <tr><td><b>🐯 Kardus/Kolase</b> (3D)</td><td>Ringan, berlapis, bisa dipakai (topeng)</td><td>Topeng, diorama</td><td>Gunting hati-hati; lem bleber</td></tr>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2><span class="dot" style="background:var(--green)"></span>📝 Jurnal Pengamatan Hasil Karya</h2>
+  <p class="hint">Misi: kumpulkan <b>⭐ 3 bintang</b> dengan mengamati 3 karya (1 karya 2D + 1 karya 3D + 1 bebas)!</p>
+  <label>😊 Nama kamu</label>
+  <input id="nama" placeholder="Contoh: Aisyah — Kelas 4B">
+  <div class="step">
+    <h3><span class="no">1</span>Ketuk gambar karya yang kamu amati</h3>
+    <div class="pilih" id="pilih"></div>
+  </div>
+  <div class="step">
+    <h3><span class="no">2</span>Alat & bahan apa yang dipakai? <small style="font-weight:400">(ketuk untuk memilih)</small></h3>
+    <label>🛠️ Alat (dipakai lagi 🔄)</label>
+    <div class="chips" id="chipsAlat"></div>
+    <input id="alat" placeholder="Contoh: kuas, palet">
+    <label>📦 Bahan (habis dipakai ⏳)</label>
+    <div class="chips" id="chipsBahan"></div>
+    <input id="bahan" placeholder="Contoh: cat air, kertas tebal">
+  </div>
+  <div class="step">
+    <h3><span class="no">3</span>Tulis pendapatmu <small style="font-weight:400">(ketuk pancingan kalau bingung mulai dari mana)</small></h3>
+    <div id="starters"></div>
+    <textarea id="pendapat" placeholder="Tulis pendapatmu di sini..."></textarea>
+  </div>
+  <div class="bintang" id="bintang">☆☆☆</div>
+  <div class="bar"><i id="barIsi"></i></div>
+  <p class="hint" id="hitung">Sudah terisi: 0/3 (minimal 3 karya)</p>
+  <div class="actions">
+    <button class="btn green" id="tambah">➕ Masukkan ke Jurnal</button>
+    <button class="btn blue" id="unduh">⬇️ Simpan Tugasku</button>
+    <button class="btn red" id="hapus">🗑️ Hapus Semua</button>
+  </div>
+  <div id="jurnalList"></div>
+</section>
+
+</main>
+
+<div class="modal" id="modal"><div class="sheet">
+  <img id="mImg" alt="karya">
+  <div class="pad">
+    <div class="closebar"><h2 id="mJudul" style="margin:0"></h2><button class="btn ghost" id="tutup">Tutup ✕</button></div>
+    <div id="mTag"></div>
+    <div class="kv" id="mKv"></div>
+    <p id="mCiri" style="margin:0"></p>
+  </div>
+</div></div>
+
+<div class="notif" id="notif"><div class="box">
+  <div class="emoji" id="nEmoji">💡</div>
+  <p id="nPesan"></p>
+  <div class="row"><button class="btn red ghost" id="nBatal" style="display:none">Batal</button><button class="btn" id="nOk">OK 👍</button></div>
+</div></div>
+
+<footer>Pameran Virtual • Seni Rupa Kelas 4 SD Bab 2 • File tunggal untuk GitHub Pages • Gambar: <code>assets/images/</code></footer>
+
+<script>
+const KARYA=[
+ {id:1,dimensi:"2D",judul:"Bunga & Kupu-Kupu — Pensil Warna",img:"assets/images/karya-1-pensil-warna.jpg",
+  alat:"Pensil warna (diraut), penggaris",bahan:"Kertas gambar",
+  ciri:"Hasil rapi dan halus, warna lembut kurang pekat. Cocok untuk detail kecil seperti kelopak dan mata. Cara pakai: warnai searah, jangan tekan terlalu keras agar kertas tidak sobek."},
+ {id:2,dimensi:"2D",judul:"Langit & Sawah — Cat Air",img:"assets/images/karya-2-cat-air.jpg",
+  alat:"Kuas, palet, gelas air",bahan:"Cat air, kertas tebal",
+  ciri:"Hasil cerah dan transparan, bisa dicampur (Kuning + Biru = Hijau). Cocok untuk area luas seperti langit dan laut. Hati-hati: air kebanyakan membuat bleber; tunggu hingga kering."},
+ {id:3,dimensi:"2D",judul:"Pemandangan Ceria — Krayon",img:"assets/images/karya-3-krayon.jpg",
+  alat:"Tangan langsung (tanpa air)",bahan:"Krayon lilin, kertas",
+  ciri:"Hasil tebal, pekat, cerah dan mengkilap karena lilin. Langsung oles tanpa air. Hati-hati: mudah patah, sulit dihapus, tangan bisa berminyak."},
+ {id:4,dimensi:"3D",judul:"Vas Bunga — Tanah Liat",img:"assets/images/karya-4-vas-tanah-liat.jpg",
+  alat:"Tangan, alas putar, pisau pahat",bahan:"Tanah liat, air, cat hias",
+  ciri:"Karya 3D: punya volume, bisa dilihat dari semua sisi, bertekstur. Dibentuk saat basah, dikeringkan hingga keras."},
+ {id:5,dimensi:"3D",judul:"Ikan Mas — Plastisin",img:"assets/images/karya-5-patung-plastisin.jpg",
+  alat:"Tangan, pisau plastik",bahan:"Plastisin warna-warni",
+  ciri:"Karya 3D: lunak, warna solid, bisa dibentuk ulang. Cocok untuk patung hewan kecil."},
+ {id:6,dimensi:"3D",judul:"Topeng Harimau — Kardus & Kolase",img:"assets/images/karya-6-topeng-kardus.jpg",
+  alat:"Gunting, kuas lem",bahan:"Kardus, kertas warna, lem, krayon",
+  ciri:"Karya 3D: ringan, berlapis, bisa dipakai. Menggabungkan teknik gunting-tempel (kolase) dan mewarnai."}
+];
+// galeri
+const grid=document.getElementById('grid');
+function render(f="semua"){
+ grid.innerHTML="";
+ KARYA.filter(k=>f==="semua"||k.dimensi===f).forEach(k=>{
+  const d=document.createElement('div');d.className='card';
+  d.innerHTML=`<img loading="lazy" src="${k.img}" alt="${k.judul}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 width=%27600%27 height=%27400%27><rect width=%27100%25%27 height=%27100%25%27 fill=%27%23eee%27/><text x=%2750%25%27 y=%2750%25%27 font-size=%2724%27 text-anchor=%27middle%27>Gambar belum ada</text></svg>'">
+   <div class="body"><span class="tag ${k.dimensi==='2D'?'d2':'d3'}">Karya ${k.dimensi}</span><h3>${k.judul}</h3><p>Klik untuk lihat Alat & Bahan</p></div>`;
+  d.onclick=()=>buka(k);grid.appendChild(d);
+ });
+}
+document.querySelectorAll('.filters button').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('.filters button').forEach(x=>x.classList.remove('active'));
+ b.classList.add('active');render(b.dataset.f);
+});
+// modal
+const modal=document.getElementById('modal');
+function buka(k){
+ document.getElementById('mImg').src=k.img;
+ document.getElementById('mJudul').textContent=k.judul;
+ document.getElementById('mTag').innerHTML=`<span class="tag ${k.dimensi==='2D'?'d2':'d3'}">Karya ${k.dimensi}</span>`;
+ document.getElementById('mKv').innerHTML=`<b>🛠️ Alat</b><span>${k.alat}</span><b>📦 Bahan</b><span>${k.bahan}</span>`;
+ document.getElementById('mCiri').innerHTML=`<b>Ciri hasil:</b> ${k.ciri}`;
+ modal.classList.add('open');
+ document.body.style.overflow='hidden';
+}
+function tutup(){modal.classList.remove('open');document.body.style.overflow='';}
+document.getElementById('tutup').onclick=tutup;
+modal.onclick=e=>{if(e.target===modal)tutup()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){tutup();tutupNotif();}});
+// notifikasi custom (pengganti alert/confirm bawaan)
+const notifEl=document.getElementById('notif');
+let nAksiYa=null;
+function tutupNotif(){notifEl.classList.remove('open');if(!modal.classList.contains('open'))document.body.style.overflow='';nAksiYa=null;}
+function notif(pesan,emoji){document.getElementById('nPesan').textContent=pesan;document.getElementById('nEmoji').textContent=emoji||'💡';document.getElementById('nBatal').style.display='none';document.getElementById('nOk').textContent='OK 👍';nAksiYa=null;notifEl.classList.add('open');document.body.style.overflow='hidden';}
+function tanya(pesan,onYa,emoji){document.getElementById('nPesan').textContent=pesan;document.getElementById('nEmoji').textContent=emoji||'❓';document.getElementById('nBatal').style.display='';document.getElementById('nOk').textContent='Ya';nAksiYa=onYa;notifEl.classList.add('open');document.body.style.overflow='hidden';}
+document.getElementById('nOk').onclick=()=>{const f=nAksiYa;tutupNotif();if(f)f();};
+document.getElementById('nBatal').onclick=tutupNotif;
+notifEl.onclick=e=>{if(e.target===notifEl)tutupNotif();};
+// jurnal kid-friendly: 3 langkah
+const ALAT_OPSI=["pensil warna","kuas","palet","penggaris","gunting","tangan","pisau plastik"];
+const BAHAN_OPSI=["kertas gambar","kertas tebal","cat air","krayon","tanah liat","plastisin","kardus","kertas warna","lem"];
+const PANCINGAN=["Menurutku karya ini...","Yang paling aku suka...","Warnanya terlihat..."];
+let pilihId=1;
+const pilihEl=document.getElementById('pilih');
+function gambarPilih(){
+ pilihEl.innerHTML="";
+ KARYA.forEach(k=>{
+  const b=document.createElement('button');b.type='button';b.className='pk'+(k.id===pilihId?' on':'');
+  b.innerHTML=`<img loading="lazy" src="${k.img}" alt=""><span>${k.dimensi} • ${k.judul.split('—')[0]}</span>`;
+  b.onclick=()=>{pilihId=k.id;gambarPilih();};
+  pilihEl.appendChild(b);
+ });
+}
+function buatChips(elId,opsi,inputId){
+ const w=document.getElementById(elId);w.innerHTML="";
+ opsi.forEach(o=>{
+  const c=document.createElement('button');c.type='button';c.className='chip';c.textContent=o;
+  c.onclick=()=>{
+   const inp=document.getElementById(inputId);
+   let isi=inp.value.split(',').map(s=>s.trim()).filter(Boolean);
+   if(isi.includes(o)){isi=isi.filter(x=>x!==o);c.classList.remove('on');}
+   else{isi.push(o);c.classList.add('on');}
+   inp.value=isi.join(', ');
+  };
+  w.appendChild(c);
+ });
+}
+const stEl=document.getElementById('starters');
+PANCINGAN.forEach(p=>{
+ const s=document.createElement('button');s.type='button';s.className='starter';s.textContent='💬 '+p;
+ s.onclick=()=>{const t=document.getElementById('pendapat');if(!t.value)t.value=p+' ';t.focus();};
+ stEl.appendChild(s);
+});
+gambarPilih();buatChips('chipsAlat',ALAT_OPSI,'alat');buatChips('chipsBahan',BAHAN_OPSI,'bahan');
+let J=JSON.parse(localStorage.getItem('jurnal_senirupa')||'[]');
+function simpan(){localStorage.setItem('jurnal_senirupa',JSON.stringify(J));tampil();}
+function tampil(){
+ const w=document.getElementById('jurnalList');
+ w.innerHTML=J.length?`<p><b>Koleksi jurnalmu (${J.length}):</b></p>`:"<p class='hint'>Belum ada isi jurnal. Yuk mulai dari Langkah 1! 👆</p>";
+ J.forEach((j,i)=>{
+  const d=document.createElement('div');d.className='item';
+  d.innerHTML=`<img loading="lazy" src="${j.img||''}" alt="" onerror="this.style.display='none'"><div class="tx"><button class="del" data-i="${i}">hapus</button><b>${i+1}. ${j.judul}</b><br><small>🛠️ ${j.alat} • 📦 ${j.bahan}</small><br>💬 ${j.pendapat}${j.nama?`<br><small>— ${j.nama}</small>`:""}</div>`;
+  w.appendChild(d);
+ });
+ w.querySelectorAll('.del').forEach(b=>b.onclick=()=>{J.splice(+b.dataset.i,1);simpan();});
+ const n=Math.min(J.length,3);
+ document.getElementById('bintang').textContent='★'.repeat(n)+'☆'.repeat(3-n);
+ document.getElementById('barIsi').style.width=(J.length>=3?100:Math.round(J.length/3*100))+'%';
+ const hitung=document.getElementById('hitung');
+ hitung.textContent=J.length>=3?`Hore! ${J.length} karya ✔ (boleh Simpan Tugasku)`:`Sudah terisi: ${J.length}/3 (kurang ${3-J.length} lagi)`;
+}
+function cukup(){if(J.length<3){notif(`Jurnal baru terisi ${J.length}/3 karya. Amati dan tambahkan minimal 3 karya dulu ya! (1 karya 2D + 1 karya 3D + 1 bebas)`,'📝');return false;}return true;}
+document.getElementById('tambah').onclick=()=>{
+ const k=KARYA.find(x=>x.id===pilihId);
+ const alat=document.getElementById('alat').value.trim(),bahan=document.getElementById('bahan').value.trim(),pendapat=document.getElementById('pendapat').value.trim();
+ if(!alat||!bahan||!pendapat){notif('Langkah 2 dan 3 belum lengkap. Pilih alat, bahan, lalu tulis pendapatmu!','✏️');return;}
+ const sebelum=J.length;
+ J.push({judul:k.judul,img:k.img,alat,bahan,pendapat,nama:document.getElementById('nama').value.trim()});
+ document.getElementById('alat').value=document.getElementById('bahan').value=document.getElementById('pendapat').value="";
+ document.querySelectorAll('#chipsAlat .on,#chipsBahan .on').forEach(c=>c.classList.remove('on'));
+ simpan();
+ if(sebelum<3&&J.length>=3)notif('Hore! Bintangmu lengkap ⭐⭐⭐ Tugas selesai, tekan Simpan Tugasku!','🎉');
+};
+document.getElementById('hapus').onclick=()=>{tanya('Hapus semua isi jurnal?',()=>{J=[];simpan();},'🗑️');};
+document.getElementById('unduh').onclick=()=>{
+ if(!cukup())return;
+ const nama=document.getElementById('nama').value.trim()||'Tanpa Nama';
+ let t=`JURNAL PENGAMATAN PAMERAN SENI RUPA\nKelas 4 SD - Bab 2 | PJJ Samarinda\nNama: ${nama}\nTanggal: ${new Date().toLocaleDateString('id-ID')}\n================================\n`;
+ J.forEach((j,i)=>{t+=`\n${i+1}. ${j.judul}\n   Alat: ${j.alat}\n   Bahan: ${j.bahan}\n   Pendapat: ${j.pendapat}\n`;});
+ if(!J.length)t+='\n(belum ada isi)\n';
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(new Blob([t],{type:'text/plain'}));
+ a.download='jurnal-pengamatan-seni-rupa.txt';a.click();
+};
+// tema gelap (tersimpan di browser)
+const temaBtn=document.getElementById('tema');
+function terapkanTema(){const g=localStorage.getItem('tema_senirupa')==='gelap';document.body.classList.toggle('gelap',g);temaBtn.textContent=g?'☀️ Mode Terang':'🌙 Mode Gelap';}
+temaBtn.onclick=()=>{const g=!document.body.classList.contains('gelap');document.body.classList.toggle('gelap',g);localStorage.setItem('tema_senirupa',g?'gelap':'terang');terapkanTema();};
+terapkanTema();
+render();tampil();
+</script>
+</body>
+</html>
