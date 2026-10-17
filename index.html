@@ -412,39 +412,68 @@ temaBtn.onclick=()=>{const g=!document.body.classList.contains('gelap');document
 terapkanTema();
 // tombol suara: bacakan petunjuk kegiatan & cara mengerjakan jurnal (Web Speech API)
 const suaraBtn=document.getElementById('suara');
-const PETUNJUK_SUARA="Assalamualaikum, anak-anak hebat! Selamat datang di Pameran Virtual Seni Rupa kelas empat. Tujuan kita hari ini adalah membandingkan karya seni rupa dua dimensi dan tiga dimensi, mengamati nama karya, alat, dan bahan, lalu menuliskan pendapatmu di Jurnal Pengamatan. Ingat ya: alat itu dipakai lagi, seperti kuas, gunting, dan pensil. Sedangkan bahan itu habis dipakai, seperti kertas, cat air, krayon, tanah liat, dan lem. Cara mengerjakan jurnalnya begini. Pertama, pilih dulu namamu, lalu ketuk satu gambar karya di Langkah satu, maka popup jurnal akan terbuka. Kedua, kumpulkan tiga bintang: ketuk alat dan bahan yang dipakai, tulis pendapatmu, lalu tekan Masukkan ke Jurnal. Ulangi untuk karya lain sampai tiga bintang penuh. Ketiga, kalau bintangmu sudah lengkap, tekan tombol Kirim Jurnal ke W A. Selamat mengamati karya-karyanya, ya! Semangat!";
+const PETUNJUK_SUARA="Assalamualaikum, anak-anak hebat! Selamat datang di Pameran Virtual Seni Rupa kelas empat. Tujuan kita hari ini adalah membandingkan karya seni rupa dua dimensi dan tiga dimensi, mengamati nama karya, alat, dan bahan, lalu menuliskan pendapatmu di Jurnal Pengamatan. Ingat ya: alat itu dipakai lagi, seperti kuas, gunting, dan pensil. Sedangkan bahan itu habis dipakai, seperti kertas, cat air, krayon, tanah liat, dan lem. Cara mengerjakan jurnalnya begini. Pertama, pilih dulu namamu, lalu ketuk satu gambar karya di Langkah satu, maka popup jurnal akan terbuka. Kedua, kumpulkan tiga bintang: ketuk alat dan bahan yang dipakai, tulis pendapatmu, lalu tekan Masukkan ke Jurnal. Ulangi untuk karya lain sampai tiga bintang penuh. Ketiga, kalau bintangmu sudah lengkap, tekan tombol Kirim Jurnal ke W A. Selamat mengamati karya-karyanya! Semangat!";
+// mesin suara bersama: potong per tanda baca lalu baca dengan jeda agar terdengar rapi
+function potongTeks(t){
+ const hasil=[];let isi='';
+ t.split(' ').forEach(w=>{
+  isi+=(isi?' ':'')+w;
+  if(/[.,!?]$/.test(w)){hasil.push(isi.trim());isi='';}
+ });
+ if(isi.trim())hasil.push(isi.trim());
+ return hasil;
+}
+let ucapanAktif=null;
+function hentikanUcapan(){
+ if(ucapanAktif){clearTimeout(ucapanAktif.timer);ucapanAktif=null;}
+ if('speechSynthesis' in window){speechSynthesis.cancel();}
+}
+function mulaiUcapan(teks,onSelesai){
+ if(!('speechSynthesis' in window)){if(onSelesai)onSelesai();return;}
+ hentikanUcapan();
+ const bagian=potongTeks(teks);let i=0;
+ const sumber={};
+ ucapanAktif=sumber;
+ const lanjut=()=>{
+  if(ucapanAktif!==sumber)return;
+  if(i>=bagian.length){ucapanAktif=null;if(onSelesai)onSelesai();return;}
+  const pot=bagian[i++];const akhirKlm=/[.!?]$/.test(pot);
+  const u=new SpeechSynthesisUtterance(pot);
+  u.lang='id-ID';u.rate=.95;
+  u.onend=u.onerror=()=>{
+   if(ucapanAktif!==sumber)return;
+   sumber.timer=setTimeout(lanjut,akhirKlm?350:180);
+  };
+  speechSynthesis.speak(u);
+ };
+ lanjut();
+}
 function bukaSuara(){
  if(!suaraSudah){suaraSudah=true;render();notif('Mantap! Petunjuk sudah didengar, sekarang ketuk gambarnya ya! 👆','🎉');}
  suaraBtn.textContent='🔊 Dengarkan Petunjuk';
 }
 // tombol 🔊 di popup karya: play / stop
 const mSuaraBtn=document.getElementById('mSuara');
-let uKarya=null;
 function hentikanSuaraKarya(){
- if('speechSynthesis' in window)speechSynthesis.cancel();
- uKarya=null;mSuaraBtn.textContent='🔊 Dengarkan';
+ hentikanUcapan();
+ mSuaraBtn.textContent='🔊 Dengarkan';
 }
 mSuaraBtn.onclick=()=>{
  if(!('speechSynthesis' in window)){notif('Maaf, perangkatmu belum mendukung suara. Baca ciri hasil di popup ini ya! 😊','🔇');return;}
- if(uKarya){hentikanSuaraKarya();return;}
+ if(ucapanAktif){hentikanUcapan();mSuaraBtn.textContent='🔊 Dengarkan';return;}
  speechSynthesis.cancel();
  const k=KARYA.find(x=>x.id===pilihId);
- const u=new SpeechSynthesisUtterance(`${k.judul}. Ini karya ${k.dimensi}. ${k.ciri} Alat yang dipakai: ${k.alat}. Bahannya: ${k.bahan}.`);
- u.lang='id-ID';u.rate=.95;
- u.onend=u.onerror=()=>{if(uKarya===u){uKarya=null;mSuaraBtn.textContent='🔊 Dengarkan';}};
- uKarya=u;mSuaraBtn.textContent='⏹ Stop';
- speechSynthesis.speak(u);
+ const teks=`${k.judul}. Ini karya ${k.dimensi}. ${k.ciri} Alat yang dipakai: ${k.alat}. Bahannya: ${k.bahan}.`;
+ mSuaraBtn.textContent='⏹ Stop';
+ mulaiUcapan(teks,()=>mSuaraBtn.textContent='🔊 Dengarkan');
 };
 suaraBtn.onclick=()=>{
  if(!('speechSynthesis' in window)){notif('Maaf, perangkatmu belum mendukung suara. Baca petunjuk di atas ya! 😊','🔇');bukaSuara();return;}
- if(speechSynthesis.speaking){speechSynthesis.cancel();bukaSuara();return;}
- const u=new SpeechSynthesisUtterance(PETUNJUK_SUARA);
- u.lang='id-ID';u.rate=.95;
- u.onend=u.onerror=bukaSuara;
- speechSynthesis.speak(u);
+ if(ucapanAktif){hentikanUcapan();bukaSuara();return;}
  suaraBtn.textContent='🔇 Berhenti';
+ mulaiUcapan(PETUNJUK_SUARA,bukaSuara);
 };
-document.addEventListener('visibilitychange',()=>{if(document.hidden)speechSynthesis.cancel();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)hentikanUcapan();});
 render();tampil();
 </script>
 </body>
