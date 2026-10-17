@@ -79,6 +79,13 @@ p.hint{color:var(--muted);margin-top:0}
 .kv{display:grid;grid-template-columns:130px 1fr;gap:6px 10px;background:#FFF4D6;border:2px dashed var(--line);border-radius:12px;padding:12px;margin:10px 0;font-size:15px}
 .kv b{font-size:14px}
 .closebar{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.closebar>div:first-child{flex:1;min-width:0}
+@media(max-width:640px){
+  .closebar{flex-wrap:wrap}
+  .closebar>div:first-child{width:100%}
+  .closebar>div:last-child{flex:1}
+  .closebar>div:last-child .btn{flex:1}
+}
 .btn{border:2.5px solid var(--line);border-radius:12px;background:var(--yellow);padding:10px 16px;font-weight:800;cursor:pointer;box-shadow:4px 4px 0 var(--line)}
 .btn.ghost{background:var(--card);color:var(--ink)}.btn.blue{background:#D0EBFF}.btn.green{background:#B2F2BB}.btn.red{background:#FFC9C9}
 .btn.warna{background:linear-gradient(135deg,var(--yellow),var(--pink) 50%,var(--sky))}
@@ -145,7 +152,7 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:13px}
 <body>
 
 <header class="hero">
-  <div style="display:flex;justify-content:flex-end;max-width:1020px;margin:0 auto"><button class="btn ghost" id="tema" style="padding:6px 14px;font-size:14px">🌙 Mode Gelap</button></div>
+  <div style="display:flex;justify-content:center;max-width:1020px;margin:0 auto 10px"><button class="btn ghost" id="tema" style="padding:6px 14px;font-size:14px">🌙 Mode Gelap</button></div>
   <div class="pita">
     <span class="badge">🏠 PJJ — Sabtu • Efek Karhutla Samarinda</span>
     <span class="badge">🎨 Seni Rupa Kelas 4 SD — Bab 2</span>
@@ -212,7 +219,7 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:13px}
 <div class="modal" id="modal"><div class="sheet">
   <img id="mImg" alt="karya">
   <div class="pad">
-    <div class="closebar"><div><h2 id="mJudul" style="margin:0"></h2></div><div style="display:flex;gap:10px;flex:none"><button class="btn warna" id="mSuara">🔊 Dengarkan</button><button class="btn red" id="tutup">Tutup ✕</button></div></div>
+    <div class="closebar"><div><h2 id="mJudul" style="margin:0"></h2></div><div style="display:flex;gap:10px;flex:none"><button class="btn warna" id="mSuara">🔊 Dengarkan</button><button class="btn red" id="tutup" title="Tutup" aria-label="Tutup" style="padding:10px 14px">✕</button></div></div>
     <div id="mTag"></div>
     <p id="mCiri" style="margin:0"></p>
     <div id="formJurnal">
@@ -376,7 +383,7 @@ function tampil(){
  w.innerHTML=J.length?`<p><b>Koleksi jurnalmu (${J.length}):</b></p>`:"<p class='hint'>Belum ada isi jurnal. Yuk mulai dari Langkah 1! 👆</p>";
  J.forEach((j,i)=>{
   const d=document.createElement('div');d.className='item';
-  d.innerHTML=`<img loading="lazy" src="${j.img||''}" alt="" onerror="this.style.display='none'"><div class="tx"><button class="del" data-i="${i}">hapus</button><b>${i+1}. ${j.judul}</b><br><small>🛠️ ${j.alat} • 📦 ${j.bahan}</small><br>💬 ${j.pendapat}${j.nama?`<br><small>— ${j.nama}</small>`:""}</div>`;
+   d.innerHTML=`<img loading="lazy" src="${j.img||''}" alt="" onerror="this.style.display='none'"><div class="tx"><button class="del" data-i="${i}">🗑️ Hapus</button><b>${i+1}. ${j.judul}</b><br><small>🛠️ ${j.alat} • 📦 ${j.bahan}</small><br>💬 ${j.pendapat}${j.nama?`<br><small>— ${j.nama}</small>`:""}</div>`;
   w.appendChild(d);
  });
  w.querySelectorAll('.del').forEach(b=>b.onclick=()=>{J.splice(+b.dataset.i,1);simpan();});
