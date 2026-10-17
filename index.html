@@ -198,7 +198,7 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:13px}
   <h2><span class="dot" style="background:var(--mint)"></span>📝 Jurnal Pengamatan Hasil Karya</h2>
   <p class="hint">Misi: kumpulkan <b>⭐ 3 bintang</b> dengan mengamati 3 karya (1 karya 2D + 1 karya 3D + 1 bebas)!</p>
   <div class="kv" style="margin-top:0"><b>📋 Cara Mengerjakan</b><span>1. 🖼️ Lihat-lihat galeri di atas, lalu ketuk 1 gambar karya di Langkah 1 bawah ini → popup jurnal terbuka.<br>2. ⭐ Kumpulkan 3 bintang: ketuk alat &amp; bahan → tulis pendapatmu → tekan “Masukkan ke Jurnal”. Ulangi untuk karya lain sampai 3 bintang.<br>3. 🎉 Kalau bintang sudah penuh, tekan “Kirim Jurnal ke WA”.<br>4. 💡 Ingat: Alat = dipakai lagi 🔄, Bahan = habis dipakai ⏳.</span></div>
-  <label>😊 Nama kamu</label>
+  <label for="nama">😊 Nama kamu</label>
   <select id="nama"><option value="">— Pilih namamu —</option></select>
   <div class="step">
     <h3><span class="no">1</span>Ketuk gambar karya yang mau kamu amati</h3>
@@ -225,10 +225,10 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:13px}
     <div id="formJurnal">
     <div class="step">
       <h3><span class="no">1</span>Alat &amp; bahan apa yang dipakai? <small style="font-weight:400">(ketuk untuk memilih)</small></h3>
-      <label>🛠️ Alat (dipakai lagi 🔄)</label>
+      <label for="alat">🛠️ Alat (dipakai lagi 🔄)</label>
       <div class="chips" id="chipsAlat"></div>
       <input id="alat" placeholder="Contoh: kuas, palet">
-      <label>📦 Bahan (habis dipakai ⏳)</label>
+      <label for="bahan">📦 Bahan (habis dipakai ⏳)</label>
       <div class="chips" id="chipsBahan"></div>
       <input id="bahan" placeholder="Contoh: cat air, kertas tebal">
     </div>
@@ -271,6 +271,8 @@ const KARYA=[
   alat:"Gunting, kuas lem",bahan:"Kardus, kertas warna, lem, krayon",
   ciri:"Topeng ini tersusun dari beberapa lapis yang saling menutup. Bekas potongannya terlihat. Bentuk kiri dan kanannya sama dengan corak belang. Ada lubang untuk mata dan tali di sisinya sehingga dapat dipakai."}
 ];
+// escape HTML: teks dari localStorage (jurnal siswa) aman dirender lewat innerHTML
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 // acak urutan tampil tiap dibuka (posisi karya & pilihan tidak bisa dihafal)
 function kocok(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 kocok(KARYA);
@@ -281,9 +283,13 @@ function render(f="semua"){
  grid.innerHTML="";
  KARYA.filter(k=>f==="semua"||k.dimensi===f).forEach(k=>{
   const d=document.createElement('div');d.className='card'+(suaraSudah?'':' kunci');
-  d.innerHTML=`<img loading="lazy" src="${k.img}" alt="${k.judul}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 width=%27600%27 height=%27400%27><rect width=%27100%25%27 height=%27100%25%27 fill=%27%23eee%27/><text x=%2750%25%27 y=%2750%25%27 font-size=%2724%27 text-anchor=%27middle%27>Gambar belum ada</text></svg>'">
-   <div class="body"><span class="tag ${k.dimensi==='2D'?'d2':'d3'}">Karya ${k.dimensi}</span><h3>${k.judul}</h3><p>Ketuk untuk lihat detail</p></div>`;
-  d.onclick=()=>{if(!suaraSudah){notif('Dengarkan dulu petunjuknya ya! Tekan tombol 🔊 Dengarkan Petunjuk di atas.','🔊');return;}buka(k,false);};grid.appendChild(d);
+  d.tabIndex=0;d.setAttribute('role','button');
+  d.innerHTML=`<img loading="lazy" src="${k.img}" alt="${esc(k.judul)}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 width=%27600%27 height=%27400%27><rect width=%27100%25%27 height=%27100%25%27 fill=%27%23eee%27/><text x=%2750%25%27 y=%2750%25%27 font-size=%2724%27 text-anchor=%27middle%27>Gambar belum ada</text></svg>'">
+   <div class="body"><span class="tag ${k.dimensi==='2D'?'d2':'d3'}">Karya ${k.dimensi}</span><h3>${esc(k.judul)}</h3><p>Ketuk untuk lihat detail</p></div>`;
+  const klikKartu=()=>{if(!suaraSudah){notif('Dengarkan dulu petunjuknya ya! Tekan tombol 🔊 Dengarkan Petunjuk di atas.','🔊');return;}buka(k,false);};
+  d.onclick=klikKartu;
+  d.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();klikKartu();}};
+  grid.appendChild(d);
  });
  terapkanMode();
 }
@@ -336,12 +342,14 @@ const SISWA=["Abdulah","Anggita Febbyolla Shalza Billa","Arkan Said Ramadan","Bi
 const namaSel=document.getElementById('nama');
 SISWA.forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;namaSel.appendChild(o);});
 function namaTerisi(){const v=namaSel.value.trim();if(!v){notif('Pilih dulu namamu di atas ya! 😊','🙋');return '';}return v;}
+// entri jurnal milik siswa yang dipilih saja (satu perangkat bisa dipakai banyak anak)
+function jurnalSaya(){const n=namaSel.value.trim();return J.filter(j=>j.nama===n);}
 const ALAT_OPSI=["pensil","penghapus","rautan","penggaris","kuas","palet","gelas air","gunting","pisau pahat","pisau plastik","alas putar","tangan"];
 const BAHAN_OPSI=["pensil warna","cat air","krayon","kertas gambar","kertas tebal","kertas warna","kardus","tanah liat","plastisin","lem","air","cat hias"];
 const PANCINGAN=["Menurutku karya ini..."];
 let pilihId=1;
 const pilihEl=document.getElementById('pilih');
-function sudahDiamati(k){return J.some(j=>(j.id&&j.id===k.id)||(!j.id&&j.judul===k.judul));}
+function sudahDiamati(k){return jurnalSaya().some(j=>(j.id&&j.id===k.id)||(!j.id&&j.judul===k.judul));}
 function gambarPilih(){
  const adaNama=namaSel.value.trim()!=='';
  pilihEl.innerHTML="";
@@ -353,7 +361,7 @@ function gambarPilih(){
   pilihEl.appendChild(b);
  });
 }
-namaSel.onchange=gambarPilih;
+namaSel.onchange=()=>{gambarPilih();tampil();};
 function buatChips(elId,opsi,inputId){
  const w=document.getElementById(elId);w.innerHTML="";
  kocok([...opsi]).forEach(o=>{
@@ -375,46 +383,56 @@ PANCINGAN.forEach(p=>{
  stEl.appendChild(s);
 });
 buatChips('chipsAlat',ALAT_OPSI,'alat');buatChips('chipsBahan',BAHAN_OPSI,'bahan');
-let J=JSON.parse(localStorage.getItem('jurnal_senirupa')||'[]');
+let J=[];
+try{const d=JSON.parse(localStorage.getItem('jurnal_senirupa')||'[]');if(Array.isArray(d))J=d.filter(j=>j&&typeof j==='object');}catch(e){/* data korup → mulai kosong */}
 gambarPilih();
 function simpan(){localStorage.setItem('jurnal_senirupa',JSON.stringify(J));tampil();}
 function tampil(){
  const w=document.getElementById('jurnalList');
- w.innerHTML=J.length?`<p><b>Koleksi jurnalmu (${J.length}):</b></p>`:"<p class='hint'>Belum ada isi jurnal. Yuk mulai dari Langkah 1! 👆</p>";
- J.forEach((j,i)=>{
-  const d=document.createElement('div');d.className='item';
-   d.innerHTML=`<img loading="lazy" src="${j.img||''}" alt="" onerror="this.style.display='none'"><div class="tx"><button class="del" data-i="${i}">🗑️ Hapus</button><b>${i+1}. ${j.judul}</b><br><small>🛠️ ${j.alat} • 📦 ${j.bahan}</small><br>💬 ${j.pendapat}${j.nama?`<br><small>— ${j.nama}</small>`:""}</div>`;
-  w.appendChild(d);
- });
+ const daftar=jurnalSaya();
+ if(!namaSel.value.trim()){
+  w.innerHTML="<p class='hint'>Pilih dulu namamu di atas untuk melihat jurnalmu. 👆</p>";
+ }else{
+  w.innerHTML=daftar.length?`<p><b>Koleksi jurnalmu (${daftar.length}):</b></p>`:"<p class='hint'>Belum ada isi jurnal. Yuk mulai dari Langkah 1! 👆</p>";
+  daftar.forEach((j,i)=>{
+   const d=document.createElement('div');d.className='item';
+    d.innerHTML=`<img loading="lazy" src="${esc(j.img||'')}" alt="" onerror="this.style.display='none'"><div class="tx"><button class="del" data-i="${J.indexOf(j)}">🗑️ Hapus</button><b>${i+1}. ${esc(j.judul)}</b><br><small>🛠️ ${esc(j.alat)} • 📦 ${esc(j.bahan)}</small><br>💬 ${esc(j.pendapat)}${j.nama?`<br><small>— ${esc(j.nama)}</small>`:""}</div>`;
+   w.appendChild(d);
+  });
+ }
  w.querySelectorAll('.del').forEach(b=>b.onclick=()=>{J.splice(+b.dataset.i,1);simpan();});
- const n=Math.min(J.length,3);
+ const n=Math.min(daftar.length,3);
  document.getElementById('bintang').textContent='★'.repeat(n)+'☆'.repeat(3-n);
- document.getElementById('barIsi').style.width=(J.length>=3?100:Math.round(J.length/3*100))+'%';
+ document.getElementById('barIsi').style.width=(daftar.length>=3?100:Math.round(daftar.length/3*100))+'%';
  const hitung=document.getElementById('hitung');
- hitung.textContent=J.length>=3?`Hore! ${J.length} karya ✔ (boleh kirim ke WA)`:`Sudah terisi: ${J.length}/3 (kurang ${3-J.length} lagi)`;
+ hitung.textContent=daftar.length>=3?`Hore! ${daftar.length} karya ✔ (boleh kirim ke WA)`:`Sudah terisi: ${daftar.length}/3 (kurang ${3-daftar.length} lagi)`;
  gambarPilih();
 }
-function cukup(){if(J.length<3){notif(`Jurnal baru terisi ${J.length}/3 karya. Amati dan tambahkan minimal 3 karya dulu ya! (1 karya 2D + 1 karya 3D + 1 bebas)`,'📝');return false;}return true;}
+function cukup(){const n=jurnalSaya().length;if(n<3){notif(`Jurnal baru terisi ${n}/3 karya. Amati dan tambahkan minimal 3 karya dulu ya! (1 karya 2D + 1 karya 3D + 1 bebas)`,'📝');return false;}return true;}
 document.getElementById('tambah').onclick=()=>{
  const k=KARYA.find(x=>x.id===pilihId);
  const alat=document.getElementById('alat').value.trim(),bahan=document.getElementById('bahan').value.trim(),pendapat=document.getElementById('pendapat').value.trim();
  if(!alat||!bahan||!pendapat){notif('Langkah 1 dan 2 belum lengkap. Pilih alat, bahan, lalu tulis pendapatmu!','✏️');return;}
- const sebelum=J.length;
- const nm=namaTerisi();if(!nm)return;
- J.push({id:k.id,judul:k.judul,img:k.img,alat,bahan,pendapat,nama:nm});
- document.getElementById('alat').value=document.getElementById('bahan').value=document.getElementById('pendapat').value="";
- document.querySelectorAll('#chipsAlat .on,#chipsBahan .on').forEach(c=>c.classList.remove('on'));
- simpan();
- tutup();
- if(sebelum<3&&J.length>=3)notif('Hore! Bintangmu lengkap ⭐⭐⭐ Tugas selesai, tekan Kirim Jurnal ke WA!','🎉');
+  const nm=namaTerisi();if(!nm)return;
+  const sebelum=jurnalSaya().length;
+  J.push({id:k.id,judul:k.judul,img:k.img,alat,bahan,pendapat,nama:nm});
+  document.getElementById('alat').value=document.getElementById('bahan').value=document.getElementById('pendapat').value="";
+  document.querySelectorAll('#chipsAlat .on,#chipsBahan .on').forEach(c=>c.classList.remove('on'));
+  simpan();
+  tutup();
+  if(sebelum<3&&jurnalSaya().length>=3)notif('Hore! Bintangmu lengkap ⭐⭐⭐ Tugas selesai, tekan Kirim Jurnal ke WA!','🎉');
 };
-document.getElementById('hapus').onclick=()=>{tanya('Hapus semua isi jurnal?',()=>{J=[];simpan();},'🗑️');};
+document.getElementById('hapus').onclick=()=>{
+ const nm=namaTerisi();if(!nm)return;
+ tanya(`Hapus semua isi jurnal milik ${nm}?`,()=>{J=J.filter(j=>j.nama!==nm);simpan();},'🗑️');
+};
 document.getElementById('unduh').onclick=()=>{
- if(!cukup())return;
  const nama=namaTerisi();if(!nama)return;
+ if(!cukup())return;
+ const daftar=jurnalSaya();
  // dibangun dengan \n lalu di-encode sekaligus agar emoji & koma aman
  let msg=`Assalamu'alaikum, ini jurnal pengamatan pameran seni rupa saya.\n\nNama: ${nama}\nTanggal: ${new Date().toLocaleDateString('id-ID')}\n`;
- J.forEach((j,i)=>{msg+=`\n${i+1}. ${j.judul}\nAlat: ${j.alat}\nBahan: ${j.bahan}\nPendapat: ${j.pendapat}\n`;});
+ daftar.forEach((j,i)=>{msg+=`\n${i+1}. ${j.judul}\nAlat: ${j.alat}\nBahan: ${j.bahan}\nPendapat: ${j.pendapat}\n`;});
  msg+=`\nMohon diperiksa, terima kasih.`;
  window.open('https://wa.me/6282250903536?text='+encodeURIComponent(msg),'_blank');
 };
