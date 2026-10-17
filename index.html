@@ -299,6 +299,7 @@ const modal=document.getElementById('modal');
 function buka(k,denganForm){
  pilihId=k.id;
  hentikanSuaraKarya();
+ document.getElementById('mSuara').style.display=denganForm?'none':'';
  document.getElementById('formJurnal').style.display=denganForm?'':'none';
  document.getElementById('mImg').src=k.img;
  document.getElementById('mJudul').textContent=k.judul;
