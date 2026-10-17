@@ -58,6 +58,10 @@ p.hint{color:var(--muted);margin-top:0}
 .titik i.on{background:var(--ink);opacity:1}
 .card{border:2.5px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card);cursor:pointer;transition:transform .15s}
 .card:hover{transform:translateY(-3px) rotate(-.3deg)}
+.card.kunci{cursor:not-allowed;opacity:.6;position:relative}
+.card.kunci:hover{transform:none}
+.card.kunci img{filter:grayscale(.5)}
+.card.kunci::after{content:"🔒 Dengarkan Petunjuk dulu!";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--yellow);border:2px solid var(--line);border-radius:999px;padding:4px 10px;font-weight:800;font-size:12.5px;color:#1E1610;white-space:nowrap}
 .card img{width:100%;height:180px;object-fit:cover;display:block;border-bottom:2.5px solid var(--line);background:#eee}
 .card .body{padding:12px}
 .tag{font-size:12px;font-weight:800;border:2px solid var(--line);border-radius:999px;padding:2px 10px;display:inline-block;color:#1E1610}
@@ -75,6 +79,8 @@ p.hint{color:var(--muted);margin-top:0}
 .closebar{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .btn{border:2.5px solid var(--line);border-radius:12px;background:var(--yellow);padding:10px 16px;font-weight:800;cursor:pointer;box-shadow:4px 4px 0 var(--line)}
 .btn.ghost{background:var(--card);color:var(--ink)}.btn.blue{background:#D0EBFF}.btn.green{background:#B2F2BB}.btn.red{background:#FFC9C9}
+.btn.warna{background:linear-gradient(135deg,var(--yellow),var(--pink) 50%,var(--sky))}
+.btn.wa{background:#25D366}
 /* tables */
 table{width:100%;border-collapse:collapse;font-size:14.5px}
 th,td{border:2px solid var(--line);padding:9px 8px;text-align:left;vertical-align:top}
@@ -147,6 +153,7 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:13px}
 <main>
 
 <section class="sec-galeri">
+  <div style="margin-bottom:10px"><button class="btn warna" id="suara" style="padding:8px 16px;font-size:14px">🔊 Dengarkan Petunjuk</button></div>
   <h2><span class="dot" style="background:var(--pink)"></span>Ruang Pamer — Klik gambar untuk detail</h2>
   <p class="hint">Ada 6 karya: 3 karya <b>2D</b> (hanya bisa dilihat dari depan) dan 3 karya <b>3D</b> (bisa dilihat dari semua sisi, punya volume).</p>
   <div class="filters">
@@ -189,7 +196,7 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:13px}
   <div class="bar"><i id="barIsi"></i></div>
   <p class="hint" id="hitung">Sudah terisi: 0/3 (minimal 3 karya)</p>
   <div class="actions">
-    <button class="btn blue" id="unduh">📩 Kirim Jurnal ke WA</button>
+    <button class="btn wa" id="unduh">📩 Kirim Jurnal ke WA</button>
     <button class="btn red" id="hapus">🗑️ Hapus Semua</button>
   </div>
   <div id="jurnalList"></div>
@@ -200,7 +207,7 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:13px}
 <div class="modal" id="modal"><div class="sheet">
   <img id="mImg" alt="karya">
   <div class="pad">
-    <div class="closebar"><h2 id="mJudul" style="margin:0"></h2><button class="btn red" id="tutup">Tutup ✕</button></div>
+    <div class="closebar"><div><h2 id="mJudul" style="margin:0"></h2></div><div style="display:flex;gap:10px;flex:none"><button class="btn warna" id="mSuara">🔊 Dengarkan</button><button class="btn red" id="tutup">Tutup ✕</button></div></div>
     <div id="mTag"></div>
     <p id="mCiri" style="margin:0"></p>
     <div id="formJurnal">
@@ -256,14 +263,15 @@ const KARYA=[
 function kocok(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 kocok(KARYA);
 // galeri
+let suaraSudah=false;
 const grid=document.getElementById('grid');
 function render(f="semua"){
  grid.innerHTML="";
  KARYA.filter(k=>f==="semua"||k.dimensi===f).forEach(k=>{
-  const d=document.createElement('div');d.className='card';
+  const d=document.createElement('div');d.className='card'+(suaraSudah?'':' kunci');
   d.innerHTML=`<img loading="lazy" src="${k.img}" alt="${k.judul}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 width=%27600%27 height=%27400%27><rect width=%27100%25%27 height=%27100%25%27 fill=%27%23eee%27/><text x=%2750%25%27 y=%2750%25%27 font-size=%2724%27 text-anchor=%27middle%27>Gambar belum ada</text></svg>'">
    <div class="body"><span class="tag ${k.dimensi==='2D'?'d2':'d3'}">Karya ${k.dimensi}</span><h3>${k.judul}</h3><p>Ketuk untuk lihat detail</p></div>`;
-  d.onclick=()=>buka(k,false);grid.appendChild(d);
+  d.onclick=()=>{if(!suaraSudah){notif('Dengarkan dulu petunjuknya ya! Tekan tombol 🔊 Dengarkan Petunjuk di atas.','🔊');return;}buka(k,false);};grid.appendChild(d);
  });
  terapkanMode();
 }
@@ -285,6 +293,7 @@ grid.addEventListener('scroll',()=>{if(grid.classList.contains('geser'))tandaiTi
 const modal=document.getElementById('modal');
 function buka(k,denganForm){
  pilihId=k.id;
+ hentikanSuaraKarya();
  document.getElementById('formJurnal').style.display=denganForm?'':'none';
  document.getElementById('mImg').src=k.img;
  document.getElementById('mJudul').textContent=k.judul;
@@ -296,7 +305,7 @@ function buka(k,denganForm){
  modal.classList.add('open');
  document.body.style.overflow='hidden';
 }
-function tutup(){modal.classList.remove('open');document.body.style.overflow='';}
+function tutup(){hentikanSuaraKarya();modal.classList.remove('open');document.body.style.overflow='';}
 document.getElementById('tutup').onclick=tutup;
 modal.onclick=e=>{if(e.target===modal)tutup()};
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){tutup();tutupNotif();}});
@@ -394,13 +403,48 @@ document.getElementById('unduh').onclick=()=>{
  let msg=`Assalamu'alaikum, ini jurnal pengamatan pameran seni rupa saya.\n\nNama: ${nama}\nTanggal: ${new Date().toLocaleDateString('id-ID')}\n`;
  J.forEach((j,i)=>{msg+=`\n${i+1}. ${j.judul}\nAlat: ${j.alat}\nBahan: ${j.bahan}\nPendapat: ${j.pendapat}\n`;});
  msg+=`\nMohon diperiksa, terima kasih.`;
- window.open('https://wa.me/6283350903536?text='+encodeURIComponent(msg),'_blank');
+ window.open('https://wa.me/6282250903536?text='+encodeURIComponent(msg),'_blank');
 };
 // tema gelap (tersimpan di browser)
 const temaBtn=document.getElementById('tema');
 function terapkanTema(){const g=localStorage.getItem('tema_senirupa')==='gelap';document.body.classList.toggle('gelap',g);temaBtn.textContent=g?'☀️ Mode Terang':'🌙 Mode Gelap';}
 temaBtn.onclick=()=>{const g=!document.body.classList.contains('gelap');document.body.classList.toggle('gelap',g);localStorage.setItem('tema_senirupa',g?'gelap':'terang');terapkanTema();};
 terapkanTema();
+// tombol suara: bacakan petunjuk kegiatan & cara mengerjakan jurnal (Web Speech API)
+const suaraBtn=document.getElementById('suara');
+const PETUNJUK_SUARA="Assalamualaikum, anak-anak hebat! Selamat datang di Pameran Virtual Seni Rupa kelas empat. Tujuan kita hari ini adalah membandingkan karya seni rupa dua dimensi dan tiga dimensi, mengamati nama karya, alat, dan bahan, lalu menuliskan pendapatmu di Jurnal Pengamatan. Ingat ya: alat itu dipakai lagi, seperti kuas, gunting, dan pensil. Sedangkan bahan itu habis dipakai, seperti kertas, cat air, krayon, tanah liat, dan lem. Cara mengerjakan jurnalnya begini. Pertama, pilih dulu namamu, lalu ketuk satu gambar karya di Langkah satu, maka popup jurnal akan terbuka. Kedua, kumpulkan tiga bintang: ketuk alat dan bahan yang dipakai, tulis pendapatmu, lalu tekan Masukkan ke Jurnal. Ulangi untuk karya lain sampai tiga bintang penuh. Ketiga, kalau bintangmu sudah lengkap, tekan tombol Kirim Jurnal ke W A. Selamat mengamati karya-karyanya, ya! Semangat!";
+function bukaSuara(){
+ if(!suaraSudah){suaraSudah=true;render();notif('Mantap! Petunjuk sudah didengar, sekarang ketuk gambarnya ya! 👆','🎉');}
+ suaraBtn.textContent='🔊 Dengarkan Petunjuk';
+}
+// tombol 🔊 di popup karya: play / stop
+const mSuaraBtn=document.getElementById('mSuara');
+let uKarya=null;
+function hentikanSuaraKarya(){
+ if('speechSynthesis' in window)speechSynthesis.cancel();
+ uKarya=null;mSuaraBtn.textContent='🔊 Dengarkan';
+}
+mSuaraBtn.onclick=()=>{
+ if(!('speechSynthesis' in window)){notif('Maaf, perangkatmu belum mendukung suara. Baca ciri hasil di popup ini ya! 😊','🔇');return;}
+ if(uKarya){hentikanSuaraKarya();return;}
+ speechSynthesis.cancel();
+ const k=KARYA.find(x=>x.id===pilihId);
+ const u=new SpeechSynthesisUtterance(`${k.judul}. Ini karya ${k.dimensi}. ${k.ciri} Alat yang dipakai: ${k.alat}. Bahannya: ${k.bahan}.`);
+ u.lang='id-ID';u.rate=.95;
+ u.onend=u.onerror=()=>{if(uKarya===u){uKarya=null;mSuaraBtn.textContent='🔊 Dengarkan';}};
+ uKarya=u;mSuaraBtn.textContent='⏹ Stop';
+ speechSynthesis.speak(u);
+};
+suaraBtn.onclick=()=>{
+ if(!('speechSynthesis' in window)){notif('Maaf, perangkatmu belum mendukung suara. Baca petunjuk di atas ya! 😊','🔇');bukaSuara();return;}
+ if(speechSynthesis.speaking){speechSynthesis.cancel();bukaSuara();return;}
+ const u=new SpeechSynthesisUtterance(PETUNJUK_SUARA);
+ u.lang='id-ID';u.rate=.95;
+ u.onend=u.onerror=bukaSuara;
+ speechSynthesis.speak(u);
+ suaraBtn.textContent='🔇 Berhenti';
+};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)speechSynthesis.cancel();});
 render();tampil();
 </script>
 </body>
