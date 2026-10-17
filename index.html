@@ -28,9 +28,11 @@ body{margin:0;background:var(--paper);color:var(--ink);
 body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;
   background-image:radial-gradient(#00000010 1.2px, transparent 1.2px);background-size:22px 22px}
 header.hero{border-bottom:3px solid var(--line);background:linear-gradient(135deg,#FFE3EE,#FFF3C4 35%,#D8F3DC 65%,#D0EBFF);padding:28px 18px 20px;text-align:center}
-.badge{display:inline-block;border:2px solid var(--line);border-radius:999px;padding:4px 14px;font-weight:700;font-size:13px;background:var(--card);box-shadow:3px 3px 0 var(--line);margin:4px}
+.pita{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:1020px;margin:0 auto}
+.badge{display:inline-block;border:2px solid var(--line);border-radius:999px;padding:4px 14px;font-weight:700;font-size:13px;background:var(--card);box-shadow:3px 3px 0 var(--line);margin:0}
 h1{font-size:clamp(24px,5vw,42px);margin:10px 0 6px;letter-spacing:.3px}
 .sub{max-width:760px;margin:0 auto;color:var(--muted)}
+.heroImg{display:block;width:100%;max-width:860px;height:auto;margin:14px auto 0;border:3px solid var(--line);border-radius:18px;box-shadow:6px 6px 0 var(--line)}
 main{max-width:1020px;margin:0 auto;padding:18px 14px 60px}
 section{background:var(--card);border:2.5px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:6px 6px 0 var(--line);margin:18px 0}
 section.sec-galeri{background:#FFF2F7}
@@ -92,7 +94,7 @@ label{font-weight:800;font-size:14px;display:block;margin:10px 0 4px}
 select,input,textarea{width:100%;border:2.5px solid var(--line);border-radius:12px;padding:10px;font-family:inherit;font-size:15px;background:var(--card);color:var(--ink)}
 textarea{min-height:76px;resize:vertical}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(max-width:640px){.row2{grid-template-columns:1fr}.kv{grid-template-columns:1fr}}
+@media(max-width:640px){.row2{grid-template-columns:1fr}.kv{grid-template-columns:1fr}.badge{font-size:12px;padding:4px 10px}.pita{gap:6px}}
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
 #jurnalList{margin-top:12px}
 .item{border:2px solid var(--line);border-radius:12px;padding:10px;margin:8px 0;background:var(--card)}
@@ -144,10 +146,13 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:13px}
 
 <header class="hero">
   <div style="display:flex;justify-content:flex-end;max-width:1020px;margin:0 auto"><button class="btn ghost" id="tema" style="padding:6px 14px;font-size:14px">🌙 Mode Gelap</button></div>
-  <span class="badge">🏠 PJJ — Sabtu • Efek Karhutla Samarinda</span>
-  <span class="badge">🎨 Seni Rupa Kelas 4 SD — Bab 2</span>
+  <div class="pita">
+    <span class="badge">🏠 PJJ — Sabtu • Efek Karhutla Samarinda</span>
+    <span class="badge">🎨 Seni Rupa Kelas 4 SD — Bab 2</span>
+  </div>
   <h1>🖼️ Pameran Virtual Karya Seni Rupa</h1>
   <p class="sub"><b>Tujuan:</b> membandingkan karakteristik hasil karya <b>2D</b> dan <b>3D</b>, serta mengamati <b>Nama/Jenis karya, Alat, Bahan,</b> dan menuliskan <b>Pendapat</b> di Jurnal Pengamatan.</p>
+  <img src="assets/images/hero-pameran-seni.jpeg" alt="Ilustrasi ruang pamer virtual karya seni rupa" class="heroImg">
 </header>
 
 <main>
